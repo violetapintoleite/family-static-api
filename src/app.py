@@ -31,15 +31,37 @@ def get_all_members():
     # this is how you can use the Family datastructure by calling its methods
   
 
-    return(jsonify(jackson_family.get_all_members())), 200
+    members= jackson_family.get_all_members()
+    return jsonify(members),200
    
 
-@app.route('/member/<int:member_id>', methods=['GET'])
-def get_member_by_id(member_id):
-    member = jackson_family.get_member_by_id(member_id)
-    
-    return(jsonify(member.serialize())), 200
+@app.route('/member', methods=['POST'])
+def add_member():
+    id = request.json.get("id")
+    first_name= request.json.get("first_name")
+    last_name= request.json.get('last_name')
+    age = request.json.get("age")
+    lucky_numbers = request.json.get("lucky_numbers")
+    newmember= {
+        "id": id or jackson_family._generateId(),
+        "first_name": first_name,
+        "last_name" : last_name,
+        "age" : age,
+        "lucky_numbers" : lucky_numbers
+    }
+    jackson_family.add_member(newmember)
+    return jsonify({}),200
 
+@app.route('/member/<int:id>', methods=['GET'])
+def get_member(id):
+    member = jackson_family.get_member(id)
+    
+    return(jsonify(member)), 200
+    
+@app.route('/member/<int:id>', methods=['DELETE'])
+def delete_member(id):
+    jackson_family.delete_member(id)
+    return jsonify({"done":True}),200
     
 
 # this only runs if `$ python src/app.py` is executed
